@@ -77,6 +77,9 @@ func main() {
 
 	log.Println("total cities", len(merged))
 	mergecountries := process.MergeCountries(countries, addcountries)
+	for _, c := range mergecountries {
+		log.Println("country", c.Name, c.Abbr, c.Abbr3)
+	}
 
 	log.Println("total countries", len(mergecountries))
 	converted := process.Convert(locs, mergecountries)

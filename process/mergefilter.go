@@ -17,7 +17,8 @@ func MergeCities(cities []geonames.City, mcities []geonames.City) []geonames.Cit
 	}
 
 	merged := []geonames.City{}
-	for _, c := range cities {
+	for i := 0; i < len(cities); i++ {
+		c := cities[i]
 		key := getKey(c.Name, c.State, c.Country)
 		if mc, ok := mlookup[key]; ok {
 			found[key] = true
@@ -85,27 +86,28 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 	}
 
 	pfiltered := []*geonames.City{}
+	dedup := make(map[string]bool)
 	for _, c := range find {
 		k := getKey(c.Name, c.State, c.Country)
+		_, duped := dedup[k]
 		if fc, ok := allKeys[k]; ok {
-			if fc.parent == nil {
+			if fc.parent == nil && !duped {
 				pfiltered = append(pfiltered, fc.c)
-			} else {
+			} else if fc.parent != nil {
 				p := fc.parent
-				p.AlternateNames = append(p.AlternateNames, fc.c.Name)
+				p.AlternateNames = append(p.AlternateNames, c.Name)
+
+				k2 := getKey(p.Name, p.State, p.Country)
+				if _, ok := dedup[k2]; !ok {
+					pfiltered = append(pfiltered, p)
+					dedup[k2] = true
+				}
 			}
 		}
+		dedup[k] = true
 	}
 	filtered := []geonames.City{}
 	for _, p := range pfiltered {
-		for i := len(p.AlternateNames) - 1; i >= 0; i-- {
-			a := p.AlternateNames[i]
-			k2 := getKey(a, p.State, p.Country)
-			if _, ok := findKeys[k2]; !ok {
-				p.AlternateNames = append(p.AlternateNames[:i], p.AlternateNames[i+1:]...)
-			}
-
-		}
 		filtered = append(filtered, *p)
 	}
 	return filtered
@@ -115,19 +117,19 @@ func MergeCountries(list []geonames.Country, mlist []geonames.Country) []geoname
 	mlookup := make(map[string]geonames.Country)
 	found := make(map[string]bool)
 	for _, c := range mlist {
-		mlookup[c.Abbr] = c
-		found[c.Abbr] = false
+		mlookup[c.Abbr3] = c
+		found[c.Abbr3] = false
 	}
 
 	merged := []geonames.Country{}
 	for _, c := range list {
-		if _, ok := mlookup[c.Abbr]; ok {
-			found[c.Abbr] = true
+		if _, ok := mlookup[c.Abbr3]; ok {
+			found[c.Abbr3] = true
 		}
 		merged = append(merged, c)
 	}
 	for _, c := range mlist {
-		if fnd, ok := found[c.Abbr]; ok && !fnd {
+		if fnd, ok := found[c.Abbr3]; ok && !fnd {
 			merged = append(merged, c)
 		}
 	}
