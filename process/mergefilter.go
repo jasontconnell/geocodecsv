@@ -1,6 +1,7 @@
 package process
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/jasontconnell/geocodecsv/data"
@@ -89,27 +90,33 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 	dedup := make(map[string]bool)
 	for _, c := range find {
 		k := getKey(c.Name, c.State, c.Country)
-		_, duped := dedup[k]
+		if _, duped := dedup[k]; duped {
+			continue
+		}
+		dedup[k] = true
+
 		if fc, ok := allKeys[k]; ok {
-			if fc.parent == nil && !duped {
+			if fc.parent == nil {
 				pfiltered = append(pfiltered, fc.c)
-			} else if fc.parent != nil {
+			} else {
 				p := fc.parent
 				p.AlternateNames = append(p.AlternateNames, c.Name)
 
 				k2 := getKey(p.Name, p.State, p.Country)
-				if _, ok := dedup[k2]; !ok {
+				if _, duped := dedup[k2]; !duped {
 					pfiltered = append(pfiltered, p)
 					dedup[k2] = true
 				}
 			}
 		}
-		dedup[k] = true
 	}
 	filtered := []geonames.City{}
 	for _, p := range pfiltered {
 		filtered = append(filtered, *p)
 	}
+	sort.Slice(filtered, func(i, j int) bool {
+		return (filtered[i].Name + filtered[i].State + filtered[i].Country) < (filtered[j].Name + filtered[j].State + filtered[j].Country)
+	})
 	return filtered
 }
 
