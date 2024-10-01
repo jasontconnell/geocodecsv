@@ -14,6 +14,8 @@ func ReadLocations(location string) ([]data.Location, error) {
 	if err != nil {
 		return nil, fmt.Errorf("couldn't open file %s. %w", location, err)
 	}
+	defer f.Close()
+
 	rdr := csv.NewReader(f)
 	lines, err := rdr.ReadAll()
 	if err != nil {
