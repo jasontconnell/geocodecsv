@@ -80,12 +80,6 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 		}
 	}
 
-	findKeys := make(map[string]string)
-	for _, c := range find {
-		k := getKey(c.Name, c.State, c.Country)
-		findKeys[k] = k
-	}
-
 	pfiltered := []*geonames.City{}
 	dedup := make(map[string]bool)
 	for _, c := range find {
