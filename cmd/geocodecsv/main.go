@@ -18,7 +18,8 @@ func main() {
 	modcitiesfile := flag.String("modcities", "", "modified locations file")
 	addcitiesfile := flag.String("addcities", "", "added locations file")
 	addcountriesfile := flag.String("addcountries", "", "added countries file")
-	output := flag.String("out", "cities.json", "output filename")
+	outcities := flag.String("out", "cities.json", "cities output filename")
+	outcountries := flag.String("writecountries", "countries.json", "countries output filename")
 	notfoundfile := flag.String("notfound", "notfound.json", "notfound output filename")
 	flag.Parse()
 
@@ -84,12 +85,17 @@ func main() {
 
 	filtered, notfound := process.Filter(merged, converted)
 
-	err = process.Write(filtered, *output)
+	err = process.WriteCities(filtered, *outcities)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = process.Write(notfound, *notfoundfile)
+	err = process.WriteCities(notfound, *notfoundfile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = process.WriteCountries(mergecountries, *outcountries)
 	if err != nil {
 		log.Fatal(err)
 	}

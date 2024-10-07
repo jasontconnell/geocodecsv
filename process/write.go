@@ -8,7 +8,15 @@ import (
 	geonames "github.com/jasontconnell/geonames/data"
 )
 
-func Write(cities []geonames.City, outfile string) error {
+func WriteCities(cities []geonames.City, outfile string) error {
+	return writeJsonFile(cities, outfile)
+}
+
+func WriteCountries(countries []geonames.Country, outfile string) error {
+	return writeJsonFile(countries, outfile)
+}
+
+func writeJsonFile(obj interface{}, outfile string) error {
 	f, err := os.OpenFile(outfile, os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't open file for writing %s. %w", outfile, err)
@@ -16,5 +24,5 @@ func Write(cities []geonames.City, outfile string) error {
 	defer f.Close()
 
 	enc := json.NewEncoder(f)
-	return enc.Encode(cities)
+	return enc.Encode(obj)
 }
