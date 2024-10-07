@@ -66,7 +66,7 @@ type filteredCity struct {
 	parent *geonames.City
 }
 
-func Filter(list []geonames.City, find []geonames.City) []geonames.City {
+func Filter(list []geonames.City, find []geonames.City) ([]geonames.City, []geonames.City) {
 	allKeys := make(map[string]filteredCity)
 	for _, c := range list {
 		k := getKey(c.Name, c.State, c.Country)
@@ -81,6 +81,7 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 	}
 
 	pfiltered := []*geonames.City{}
+	notfound := []geonames.City{}
 	dedup := make(map[string]bool)
 	for _, c := range find {
 		k := getKey(c.Name, c.State, c.Country)
@@ -102,6 +103,8 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 					dedup[k2] = true
 				}
 			}
+		} else {
+			notfound = append(notfound, c)
 		}
 	}
 	filtered := []geonames.City{}
@@ -111,7 +114,7 @@ func Filter(list []geonames.City, find []geonames.City) []geonames.City {
 	sort.Slice(filtered, func(i, j int) bool {
 		return (filtered[i].Name + filtered[i].State + filtered[i].Country) < (filtered[j].Name + filtered[j].State + filtered[j].Country)
 	})
-	return filtered
+	return filtered, notfound
 }
 
 func MergeCountries(list []geonames.Country, mlist []geonames.Country) []geonames.Country {

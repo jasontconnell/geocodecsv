@@ -19,6 +19,7 @@ func main() {
 	addcitiesfile := flag.String("addcities", "", "added locations file")
 	addcountriesfile := flag.String("addcountries", "", "added countries file")
 	output := flag.String("out", "cities.json", "output filename")
+	notfoundfile := flag.String("notfound", "notfound.json", "notfound output filename")
 	flag.Parse()
 
 	if *citiesfile == "" || *countriesfile == "" {
@@ -81,10 +82,14 @@ func main() {
 	log.Println("total countries", len(mergecountries))
 	converted := process.Convert(locs, mergecountries)
 
-	filtered := process.Filter(merged, converted)
+	filtered, notfound := process.Filter(merged, converted)
 
 	err = process.Write(filtered, *output)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	err = process.Write(notfound, *notfoundfile)
 	if err != nil {
 		log.Fatal(err)
 	}
