@@ -18,8 +18,8 @@ func main() {
 	modcitiesfile := flag.String("modcities", "", "modified locations file")
 	addcitiesfile := flag.String("addcities", "", "added locations file")
 	addcountriesfile := flag.String("addcountries", "", "added countries file")
-	outcities := flag.String("out", "cities.json", "cities output filename")
-	outcountries := flag.String("writecountries", "countries.json", "countries output filename")
+	outcities := flag.String("citiesout", "cities.json", "cities output filename")
+	outcountries := flag.String("countriesout", "countries.json", "countries output filename")
 	notfoundfile := flag.String("notfound", "notfound.json", "notfound output filename")
 	flag.Parse()
 

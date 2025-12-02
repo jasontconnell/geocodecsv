@@ -1,6 +1,7 @@
 package process
 
 import (
+	"log"
 	"sort"
 	"strings"
 
@@ -21,9 +22,14 @@ func MergeCities(cities []geonames.City, mcities []geonames.City) []geonames.Cit
 	for i := 0; i < len(cities); i++ {
 		c := cities[i]
 		key := getKey(c.Name, c.State, c.Country)
+
 		if mc, ok := mlookup[key]; ok {
 			found[key] = true
 			c.AlternateNames = append(c.AlternateNames, mc.AlternateNames...)
+			if mc.Latitude != 0 && mc.Longitude != 0 {
+				c.Latitude = mc.Latitude
+				c.Longitude = mc.Longitude
+			}
 		}
 		merged = append(merged, c)
 	}
